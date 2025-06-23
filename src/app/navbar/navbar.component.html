@@ -110,9 +110,9 @@
 >
   <div class="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-neutral-800">
     <ul class="space-y-2 font-medium">
-      <li>
+      <li *ngIf="esVeterinario()">
         <a
-          href="#"
+          href="/home"
           class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-emerald-100 dark:hover:bg-emerald-500 group"
         >
           <svg
@@ -149,13 +149,9 @@
             />
           </svg>
           <span class="flex-1 ms-3 whitespace-nowrap">Mascotas</span>
-          <span
-            class="inline-flex items-center justify-center px-2 ms-3 text-sm font-medium text-gray-800 bg-gray-100 rounded-full dark:bg-gray-700 dark:text-gray-300"
-            >Pro</span
-          >
         </a>
       </li>
-      <li>
+      <li *ngIf="esVeterinario()">
         <a
           href="#"
           class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-emerald-500 group"
@@ -174,7 +170,7 @@
           <span class="flex-1 ms-3 whitespace-nowrap">Vacunas</span>
         </a>
       </li>
-      <li>
+      <li *ngIf="esVeterinario()">
         <a
           href="#"
           class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-emerald-500 group"
@@ -197,7 +193,7 @@
           >
         </a>
       </li>
-      <li>
+      <li *ngIf="esVeterinario()">
         <a
           href="#"
           class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-emerald-500 group"
