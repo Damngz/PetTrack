@@ -7,11 +7,19 @@ import { Usuario } from './user.service';
   providedIn: 'root'
 })
 export class UsuarioApiService {
-  private apiUrl = 'http://localhost:8081/usuarios';
+  private apiUrl = 'http://localhost:8080/usuarios';
 
   constructor(private http: HttpClient) {}
 
+  createTutor(usuario: Partial<Usuario>) {
+    return this.http.post<Usuario>(this.apiUrl, usuario);
+  } 
+
   getUsuarioPorCorreo(correo: string): Observable<Usuario> {
     return this.http.get<Usuario>(`${this.apiUrl}/correo/${correo}`);
+  }
+
+  getUsuariosTutores(): Observable<Usuario[]> {
+    return this.http.get<Usuario[]>(`${this.apiUrl}/tutores`);
   }
 }
