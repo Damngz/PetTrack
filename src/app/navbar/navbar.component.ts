@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { MsalService } from '@azure/msal-angular';
 import { UserService } from '../services/user.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-navbar',
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css'
 })
@@ -32,5 +32,12 @@ export class NavbarComponent {
 
   esVeterinario(): boolean {
     return this.userService.isVeterinario();
+  }
+
+  nombreUsuario(): string {
+    const user = this.userService.getUsuario();
+    const userName = user?.nombre ? `${user.nombre} ${user.apellido}` : '';
+    const role = user?.rol ? user.rol.charAt(0).toUpperCase() + user.rol.slice(1) : '';
+    return `${userName} - ${role}`;
   }
 }

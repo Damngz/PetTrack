@@ -52,9 +52,12 @@ export class LoginComponent implements OnInit {
   private obtenerUsuarioYRedirigir(correo: string) {
     this.usuarioApi.getUsuarioPorCorreo(correo).subscribe({
       next: (usuario: Usuario) => {
-        console.log(usuario);
         this.userService.setUsuario(usuario);
-        this.router.navigate(['/home']);
+        if (usuario.rol === 'veterinario') {
+          this.router.navigate(['/home']);
+        } else {
+          this.router.navigate(['/mascotas']);
+        }
       },
       error: (err: Error) => {
         console.error('No se pudo obtener el usuario:', err);
