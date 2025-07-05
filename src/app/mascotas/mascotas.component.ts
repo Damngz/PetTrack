@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { NavbarComponent } from '../navbar/navbar.component';
 import { Mascota, MascotaService } from '../services/mascota.service';
 import { CommonModule } from '@angular/common';
 import { UserService, Usuario } from '../services/user.service';
@@ -9,7 +8,7 @@ import { UsuarioApiService } from '../services/user-api.service';
 
 @Component({
   selector: 'app-mascotas',
-  imports: [CommonModule, NavbarComponent, FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './mascotas.component.html',
   styleUrl: './mascotas.component.css',
 })
@@ -43,7 +42,6 @@ export class MascotasComponent implements OnInit {
         this.userApiAservice
           .getUsuariosTutores()
           .subscribe((u) => (this.usuarios = u));
-        console.log(this.usuarios)
       } else {
         this.mascotasService
           .getByUsuario(this.userId)
