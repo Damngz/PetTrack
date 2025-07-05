@@ -5,15 +5,15 @@ import {
   HistorialMedicoService,
   HistorialMedico,
 } from '../services/historial.service';
-import { NavbarComponent } from '../navbar/navbar.component';
 import { Mascota, MascotaService } from '../services/mascota.service';
 import { Vacuna, VacunaService } from '../services/vacuna.service';
 import { UserService, Usuario } from '../services/user.service';
 import { FormsModule } from '@angular/forms';
+import { CrearCitaComponent } from '../crear-cita/crear-cita.component';
 
 @Component({
   selector: 'app-mascota-detalle',
-  imports: [CommonModule, NavbarComponent, FormsModule],
+  imports: [CommonModule, FormsModule, CrearCitaComponent],
   templateUrl: './mascota-detalle.component.html',
   styleUrls: ['./mascota-detalle.component.css'],
 })
@@ -21,7 +21,7 @@ export class MascotaDetalleComponent implements OnInit {
   idMascota!: number;
   historial: HistorialMedico[] = [];
   mascota: Partial<Mascota> = {};
-  tab: 'historial' | 'vacunas' = 'historial';
+  tab: 'historial' | 'vacunas' | 'citas' = 'historial';
   activeTabClasses =
     'inline-block p-4 text-emerald-600 border-b-2 border-emerald-600 rounded-t-lg dark:text-emerald-400';
   inactiveTabClasses =
@@ -67,6 +67,10 @@ export class MascotaDetalleComponent implements OnInit {
       alert('Mascota actualizada correctamente');
       this.mostrarFormularioEdicion = false;
     });
+  }
+
+  volverAMascotas() {
+    this.router.navigate(['/mascotas']);
   }
 
   eliminarMascota() {

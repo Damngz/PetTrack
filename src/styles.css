@@ -1,2 +1,73 @@
 /* You can add global styles to this file, and also import other style files */
 @import "tailwindcss";
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+/* styles.css */
+
+/*
+   Esta clase es el contenedor principal del popup del datepicker.
+   Afecta el fondo general y la sombra.
+*/
+.mat-datepicker-popup .mat-calendar {
+  background-color: white !important;
+  color: black !important; /* Para asegurar que el texto sea legible */
+  box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2),
+              0px 8px 10px 1px rgba(0, 0, 0, 0.14),
+              0px 3px 14px 2px rgba(0, 0, 0, 0.12);
+  border-radius: 4px; /* Para que coincida con el estilo de Material Design */
+}
+
+/*
+   Esta clase es el contenido del calendario (días, meses, años).
+   Asegura que el fondo de esta área también sea blanco.
+*/
+.mat-datepicker-popup .mat-calendar-content {
+  background-color: white !important;
+}
+
+/*
+   Para el encabezado del calendario (donde se muestra el mes/año y los botones de navegación).
+*/
+.mat-datepicker-popup .mat-calendar-header {
+  background-color: white !important; /* Puedes poner un color diferente si quieres */
+  color: black !important;
+}
+
+/*
+   Para los nombres de los días de la semana (Lu, Ma, Mi, etc.).
+*/
+.mat-datepicker-popup .mat-calendar-table-header th {
+  color: black !important;
+}
+
+/*
+   Para el color de los números de los días.
+*/
+.mat-datepicker-popup .mat-calendar-body-cell-content {
+  color: black !important;
+}
+
+/*
+   Asegurar que los botones de navegación (flechas) sean visibles.
+*/
+.mat-datepicker-popup .mat-icon-button {
+  color: black !important;
+}
+
+/*
+   Si usaste panelClass en tu HTML (como 'custom-datepicker-panel'),
+   también podrías usarlo como un selector más específico:
+*/
+.custom-datepicker-panel {
+    background-color: white !important;
+    color: black !important;
+    box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2),
+                0px 8px 10px 1px rgba(0, 0, 0, 0.14),
+                0px 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+
+.custom-datepicker-panel .mat-calendar-content {
+    background-color: white !important;
+}
+/* ...y así sucesivamente para las otras clases internas si usas panelClass */

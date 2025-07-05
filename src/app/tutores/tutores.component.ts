@@ -2,13 +2,12 @@ import { Component } from '@angular/core';
 import { UserService, Usuario } from '../services/user.service';
 import { Router } from '@angular/router';
 import { UsuarioApiService } from '../services/user-api.service';
-import { NavbarComponent } from '../navbar/navbar.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-tutores',
-  imports: [CommonModule, NavbarComponent, FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './tutores.component.html',
   styleUrl: './tutores.component.css'
 })
