@@ -10,12 +10,22 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { UsuarioApiService } from '../services/user-api.service';
 import { Usuario } from '../services/user.service';
+import { HorarioAtencion, HorarioAtencionService } from '../services/horario.service';
 
 @Component({
   selector: 'app-crear-cita',
-  imports: [CommonModule, FormsModule, MatDatepickerModule, MatNativeDateModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatIconModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatIconModule,
+  ],
   templateUrl: './crear-cita.component.html',
-  styleUrl: './crear-cita.component.css'
+  styleUrl: './crear-cita.component.css',
 })
 export class CrearCitaComponent implements OnInit {
   @Input() idMascota!: number;
@@ -28,14 +38,31 @@ export class CrearCitaComponent implements OnInit {
   motivo: string = '';
   idVeterinarioSeleccionado: number | null = null;
   minDate = new Date();
+  horariosVet: string[] = [];
 
-  constructor(private citaService: CitaService, private dateAdapter: DateAdapter<Date>, private userAPIService: UsuarioApiService) {
+  constructor(
+    private citaService: CitaService,
+    private dateAdapter: DateAdapter<Date>,
+    private userAPIService: UsuarioApiService,
+    private horarioService: HorarioAtencionService
+  ) {
     this.dateAdapter.setLocale('es');
   }
 
   ngOnInit(): void {
     this.generarHoras();
-    this.userAPIService.getUsuariosVeterinarios().subscribe((v) => this.vets = v);
+    this.userAPIService
+      .getUsuariosVeterinarios()
+      .subscribe((v) => (this.vets = v));
+  }
+
+  onVeterinarioChange(id: number) {
+    this.idVeterinarioSeleccionado = id;
+    this.horariosVet = [];
+
+    this.horarioService.getHorariosUsuario(id).subscribe((horarios) => {
+      this.horariosVet = horarios.map((h: HorarioAtencion) => h.diaSemana);
+    });
   }
 
   generarHoras() {
@@ -56,25 +83,28 @@ export class CrearCitaComponent implements OnInit {
     if (!date) return;
 
     // Obtener citas del veterinario para ese día
-    this.citaService.getCitasPorVeterinario(this.idVeterinarioSeleccionado as number).subscribe((citas) => {
-      const citasDelDia = citas.filter((cita) => {
-        const citaDate = new Date(cita.fecha);
-        return (
-          citaDate.getFullYear() === date.getFullYear() &&
-          citaDate.getMonth() === date.getMonth() &&
-          citaDate.getDate() === date.getDate()
-        );
-      });
+    this.citaService
+      .getCitasPorVeterinario(this.idVeterinarioSeleccionado as number)
+      .subscribe((citas) => {
+        const citasDelDia = citas.filter((cita) => {
+          const citaDate = new Date(cita.fecha);
+          return (
+            citaDate.getFullYear() === date.getFullYear() &&
+            citaDate.getMonth() === date.getMonth() &&
+            citaDate.getDate() === date.getDate()
+          );
+        });
 
-      this.horasOcupadas = citasDelDia.map((c) => {
-        const d = new Date(c.fecha);
-        return d.toTimeString().substring(0, 5);
+        this.horasOcupadas = citasDelDia.map((c) => {
+          const d = new Date(c.fecha);
+          return d.toTimeString().substring(0, 5);
+        });
       });
-    });
   }
 
   guardarCita() {
-    if (!this.fechaSeleccionada || !this.horaSeleccionada || !this.motivo) return;
+    if (!this.fechaSeleccionada || !this.horaSeleccionada || !this.motivo)
+      return;
 
     const [hora, minuto] = this.horaSeleccionada.split(':').map(Number);
     const fechaFinal = new Date(this.fechaSeleccionada);
@@ -106,8 +136,20 @@ export class CrearCitaComponent implements OnInit {
   deshabilitarFecha = (d: Date | null): boolean => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    return d ? d >= today : false;
+
+    console.log(this.horariosVet)
+
+    if (!d || !this.horariosVet.length) return false;
+    if (d < today) return false;
+
+    const diasSemana: string[] = [
+      'DOMINGO', 'LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO'
+    ];
+
+    const diaTexto = diasSemana[d.getDay()];
+    return this.horariosVet.includes(diaTexto);
   };
+
 
   horaBloqueada(hora: string): boolean {
     return this.horasOcupadas.includes(hora);
