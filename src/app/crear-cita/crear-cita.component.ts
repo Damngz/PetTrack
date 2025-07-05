@@ -8,6 +8,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
+import { UsuarioApiService } from '../services/user-api.service';
+import { Usuario } from '../services/user.service';
 
 @Component({
   selector: 'app-crear-cita',
@@ -16,26 +18,28 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrl: './crear-cita.component.css'
 })
 export class CrearCitaComponent implements OnInit {
-  @Input() idUsuario!: number | undefined;
   @Input() idMascota!: number;
 
   fechaSeleccionada: Date | null = null;
   horaSeleccionada: string = '';
   horasDisponibles: string[] = [];
   horasOcupadas: string[] = [];
-
+  vets: Usuario[] = [];
   motivo: string = '';
+  idVeterinarioSeleccionado: number | null = null;
+  minDate = new Date();
 
-  constructor(private citaService: CitaService, private dateAdapter: DateAdapter<Date>) {
-    this.dateAdapter.setLocale('es'); // Opcional: para que el datepicker esté en español
+  constructor(private citaService: CitaService, private dateAdapter: DateAdapter<Date>, private userAPIService: UsuarioApiService) {
+    this.dateAdapter.setLocale('es');
   }
 
   ngOnInit(): void {
     this.generarHoras();
+    this.userAPIService.getUsuariosVeterinarios().subscribe((v) => this.vets = v);
   }
 
   generarHoras() {
-    // Horas de 09:00 a 18:00 cada 15 minutos
+    // Horas de 09:00 a 18:00 cada 30 minutos debe cambiar por la del veterinario
     for (let h = 9; h < 18; h++) {
       for (let m = 0; m < 60; m += 30) {
         const hh = h.toString().padStart(2, '0');
@@ -52,7 +56,7 @@ export class CrearCitaComponent implements OnInit {
     if (!date) return;
 
     // Obtener citas del veterinario para ese día
-    this.citaService.getCitasPorVeterinario(this.idUsuario as number).subscribe((citas) => {
+    this.citaService.getCitasPorVeterinario(this.idVeterinarioSeleccionado as number).subscribe((citas) => {
       const citasDelDia = citas.filter((cita) => {
         const citaDate = new Date(cita.fecha);
         return (
@@ -84,7 +88,7 @@ export class CrearCitaComponent implements OnInit {
 
     const cita: Cita = {
       idMascota: this.idMascota,
-      idUsuario: this.idUsuario as number,
+      idUsuario: this.idVeterinarioSeleccionado as number,
       fecha: fechaParaGuardar,
       motivo: this.motivo,
       estado: 'Pendiente',
@@ -95,6 +99,7 @@ export class CrearCitaComponent implements OnInit {
       this.fechaSeleccionada = null;
       this.horaSeleccionada = '';
       this.motivo = '';
+      this.idVeterinarioSeleccionado = null;
     });
   }
 

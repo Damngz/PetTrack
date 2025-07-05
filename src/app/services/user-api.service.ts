@@ -26,4 +26,8 @@ export class UsuarioApiService {
   getUsuariosTutores(): Observable<Usuario[]> {
     return this.http.get<Usuario[]>(`${this.apiUrl}/tutores`);
   }
+
+  getUsuariosVeterinarios(): Observable<Usuario[]> {
+    return this.http.get<Usuario[]>(`${this.apiUrl}/veterinarios`);
+  }
 }
