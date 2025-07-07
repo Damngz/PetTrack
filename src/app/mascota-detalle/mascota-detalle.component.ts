@@ -10,6 +10,8 @@ import { Vacuna, VacunaService } from '../services/vacuna.service';
 import { UserService, Usuario } from '../services/user.service';
 import { FormsModule } from '@angular/forms';
 import { CrearCitaComponent } from '../crear-cita/crear-cita.component';
+import { UsuarioApiService } from '../services/user-api.service';
+import { Cita, CitaService } from '../services/cita.service';
 
 @Component({
   selector: 'app-mascota-detalle',
@@ -29,10 +31,14 @@ export class MascotaDetalleComponent implements OnInit {
   vacunas: Vacuna[] = [];
   mostrarFormularioAtencion = false;
   mostrarFormularioVacuna = false;
+  mostrarFormularioCita = false;
   nuevaAtencion: Partial<HistorialMedico> = {};
   nuevaVacuna: Partial<Vacuna> = {};
   mostrarFormularioEdicion = false;
   user: Partial<Usuario> = {};
+  tutor: Partial<Usuario> = {};
+  citas: Cita[] = [];
+  veterinarios: Usuario[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -40,6 +46,8 @@ export class MascotaDetalleComponent implements OnInit {
     private mascotaService: MascotaService,
     private vacunaService: VacunaService,
     private userService: UserService,
+    private userAPIService: UsuarioApiService,
+    private citaService: CitaService,
     private router: Router
   ) {}
 
@@ -49,12 +57,39 @@ export class MascotaDetalleComponent implements OnInit {
     this.user = this.userService.getUsuario() as Usuario;
     this.mascotaService.getMascotaById(mascotaId).subscribe((m) => {
       this.mascota = m;
+      this.userAPIService
+        .getUsuarioPorId(this.mascota.idUsuario as number)
+        .subscribe((t) => {
+          this.tutor = t;
+        });
     });
     this.historialService.getByMascotaId(mascotaId).subscribe((h) => {
       this.historial = h;
     });
     this.vacunaService.getByMascota(mascotaId).subscribe((v) => {
       this.vacunas = v;
+    });
+    this.citaService.getCitasPorMascota(mascotaId).subscribe((c) => {
+      this.citas = c.sort((a, b) => {
+        const estadoOrden: { [key: string]: number } = {
+          Pendiente: 0,
+          Completada: 1,
+          'No asiste': 2,
+          Cancelada: 3,
+        };
+
+        const estadoA = estadoOrden[a.estado] ?? 99;
+        const estadoB = estadoOrden[b.estado] ?? 99;
+
+        if (estadoA !== estadoB) {
+          return estadoA - estadoB;
+        }
+
+        return new Date(a.fecha).getTime() - new Date(b.fecha).getTime();
+      });
+    });
+    this.userAPIService.getUsuariosVeterinarios().subscribe((v) => {
+      this.veterinarios = v;
     });
   }
 
@@ -76,11 +111,26 @@ export class MascotaDetalleComponent implements OnInit {
   eliminarMascota() {
     const del = confirm('¿Desea eliminar esta mascota?');
     if (del) {
-      this.mascotaService.deleteMascota(this.mascota.id as number).subscribe(() => {
-        alert('Mascota eliminada correctamente');
-        this.router.navigate(['/mascotas']);
-      })
+      this.mascotaService
+        .deleteMascota(this.mascota.id as number)
+        .subscribe(() => {
+          alert('Mascota eliminada correctamente');
+          this.router.navigate(['/mascotas']);
+        });
     }
+  }
+
+  nombreTutor(): string {
+    return this.tutor
+      ? `${this.tutor.nombre} ${this.tutor.apellido} (${this.tutor.rut})`
+      : 'Desconocido';
+  }
+
+  nombreVeterinario(id: number): string {
+    const veterinario = this.veterinarios.find((u) => u.id === id);
+    return veterinario
+      ? `${veterinario.nombre} ${veterinario.apellido} (${veterinario.rut})`
+      : 'Desconocido';
   }
 
   agregarAtencion() {
@@ -88,7 +138,7 @@ export class MascotaDetalleComponent implements OnInit {
       ...this.nuevaAtencion,
       idMascota: this.idMascota,
       idUsuario: this.user.id,
-      fecha: new Date().toLocaleDateString('en-CA')
+      fecha: new Date().toLocaleDateString('en-CA'),
     };
     this.historialService
       .createAtencion(nueva as HistorialMedico)
@@ -104,12 +154,50 @@ export class MascotaDetalleComponent implements OnInit {
       ...this.nuevaVacuna,
       fechaAplicacion: new Date().toLocaleDateString('en-CA'),
       idMascota: this.idMascota,
-      idUsuario: this.user.id
+      idUsuario: this.user.id,
     };
     this.vacunaService.createVacuna(nueva as Vacuna).subscribe(() => {
       alert('Vacuna administrada correctamente');
       this.vacunas.push(nueva as Vacuna);
       this.mostrarFormularioVacuna = false;
+    });
+  }
+
+  modificarCita(
+    cita: Cita,
+    estadoCita: 'Completada' | 'No asiste' | 'Cancelada'
+  ) {
+    const citaActualizada = { ...cita, estado: estadoCita };
+
+    this.citaService
+      .actualizarCita(cita.idCita as number, citaActualizada)
+      .subscribe({
+        next: () => {
+          alert('Cita actualizada con éxito');
+          const index = this.citas.findIndex(
+            (c) => c.idCita === cita.idCita
+          );
+          if (index > -1) {
+            this.citas[index].estado = estadoCita;
+          }
+        },
+        error: (err) => {
+          alert(`Error actualizando cita: ${err}`);
+        },
+      });
+  }
+
+  eliminarCita(cita: Cita) {
+    if (!confirm('¿Estás seguro de que deseas eliminar esta cita?')) return;
+
+    this.citaService.eliminarCita(cita.idCita as number).subscribe({
+      next: () => {
+        this.citas = this.citas.filter(c => c.idCita !== cita.idCita);
+        alert('Cita eliminada correctamente.');
+      },
+      error: err => {
+        alert('Error al eliminar la cita: ' + err.message);
+      }
     });
   }
 }

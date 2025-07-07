@@ -15,6 +15,10 @@ export class UsuarioApiService {
     return this.http.post<Usuario>(this.apiUrl, usuario);
   }
 
+  getUsuarios() {
+    return this.http.get<Usuario[]>(this.apiUrl);
+  }
+
   getUsuarioPorId(id: number) {
     return this.http.get<Usuario>(`${this.apiUrl}/${id}`);
   }

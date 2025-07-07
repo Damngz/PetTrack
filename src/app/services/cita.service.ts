@@ -42,4 +42,8 @@ export class CitaService {
   getCitasPorVeterinario(idUsuario: number): Observable<Cita[]> {
     return this.http.get<Cita[]>(`${this.apiUrl}/usuario/${idUsuario}`);
   }
+
+  getCitasPorMascota(idMascota: number): Observable<Cita[]> {
+    return this.http.get<Cita[]>(`${this.apiUrl}/mascota/${idMascota}`);
+  }
 }

@@ -10,7 +10,10 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { UsuarioApiService } from '../services/user-api.service';
 import { Usuario } from '../services/user.service';
-import { HorarioAtencion, HorarioAtencionService } from '../services/horario.service';
+import {
+  HorarioAtencion,
+  HorarioAtencionService,
+} from '../services/horario.service';
 
 @Component({
   selector: 'app-crear-cita',
@@ -38,7 +41,7 @@ export class CrearCitaComponent implements OnInit {
   motivo: string = '';
   idVeterinarioSeleccionado: number | null = null;
   minDate = new Date();
-  horariosVet: string[] = [];
+  horariosVet: HorarioAtencion[] = [];
 
   constructor(
     private citaService: CitaService,
@@ -50,7 +53,6 @@ export class CrearCitaComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.generarHoras();
     this.userAPIService
       .getUsuariosVeterinarios()
       .subscribe((v) => (this.vets = v));
@@ -61,28 +63,56 @@ export class CrearCitaComponent implements OnInit {
     this.horariosVet = [];
 
     this.horarioService.getHorariosUsuario(id).subscribe((horarios) => {
-      this.horariosVet = horarios.map((h: HorarioAtencion) => h.diaSemana);
+      this.horariosVet = horarios.map((h: HorarioAtencion) => h);
     });
   }
 
-  generarHoras() {
-    // Horas de 09:00 a 18:00 cada 30 minutos debe cambiar por la del veterinario
-    for (let h = 9; h < 18; h++) {
-      for (let m = 0; m < 60; m += 30) {
-        const hh = h.toString().padStart(2, '0');
-        const mm = m.toString().padStart(2, '0');
-        this.horasDisponibles.push(`${hh}:${mm}`);
-      }
+  generarHorasPorDia(dia: string) {
+    this.horasDisponibles = [];
+
+    const horarioDelDia = this.horariosVet.find(
+      (h) => h.diaSemana.toUpperCase() === dia.toUpperCase()
+    );
+
+    if (!horarioDelDia) return;
+
+    const [inicioH, inicioM] = horarioDelDia.horaInicio.split(':').map(Number);
+    const [finH, finM] = horarioDelDia.horaFin.split(':').map(Number);
+
+    let current = new Date();
+    current.setHours(inicioH, inicioM, 0, 0);
+
+    const fin = new Date();
+    fin.setHours(finH, finM, 0, 0);
+
+    while (current < fin) {
+      const hh = current.getHours().toString().padStart(2, '0');
+      const mm = current.getMinutes().toString().padStart(2, '0');
+      this.horasDisponibles.push(`${hh}:${mm}`);
+      current.setMinutes(current.getMinutes() + 30);
     }
   }
 
   onFechaChange(date: Date | null) {
     this.fechaSeleccionada = date;
     this.horasOcupadas = [];
+    this.horasDisponibles = [];
 
     if (!date) return;
 
-    // Obtener citas del veterinario para ese día
+    const diasSemana: string[] = [
+      'DOMINGO',
+      'LUNES',
+      'MARTES',
+      'MIERCOLES',
+      'JUEVES',
+      'VIERNES',
+      'SABADO',
+    ];
+    const diaTexto = diasSemana[date.getDay()];
+
+    this.generarHorasPorDia(diaTexto); // 💡 Filtra horas según el día
+
     this.citaService
       .getCitasPorVeterinario(this.idVeterinarioSeleccionado as number)
       .subscribe((citas) => {
@@ -137,19 +167,23 @@ export class CrearCitaComponent implements OnInit {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    console.log(this.horariosVet)
-
     if (!d || !this.horariosVet.length) return false;
     if (d < today) return false;
 
     const diasSemana: string[] = [
-      'DOMINGO', 'LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO'
+      'DOMINGO',
+      'LUNES',
+      'MARTES',
+      'MIERCOLES',
+      'JUEVES',
+      'VIERNES',
+      'SABADO',
     ];
 
     const diaTexto = diasSemana[d.getDay()];
-    return this.horariosVet.includes(diaTexto);
-  };
 
+    return this.horariosVet.some((h) => h.diaSemana === diaTexto);
+  };
 
   horaBloqueada(hora: string): boolean {
     return this.horasOcupadas.includes(hora);

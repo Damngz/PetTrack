@@ -17,7 +17,7 @@
     </mat-select>
   </mat-form-field>
 
-  <mat-form-field appearance="fill" class="w-full !bg-white">
+  <mat-form-field *ngIf="idVeterinarioSeleccionado" appearance="fill" class="w-full !bg-white">
     <mat-label>Fecha</mat-label>
     <input
       matInput
@@ -27,15 +27,13 @@
       name="fecha"
       [min]="minDate"
       [matDatepickerFilter]="deshabilitarFecha"
-      [ngModelOptions]="{ standalone: true }"
       required
-      class="rounded-md p-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"
     />
-    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-    <mat-datepicker #picker panelClass="custom-datepicker-panel"></mat-datepicker>
+    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
   </mat-form-field>
 
-  <mat-form-field appearance="fill" class="w-full">
+  <mat-form-field *ngIf="fechaSeleccionada" appearance="fill" class="w-full">
     <mat-label>Hora</mat-label>
     <mat-select
       [(ngModel)]="horaSeleccionada"
@@ -55,7 +53,7 @@
     </mat-select>
   </mat-form-field>
 
-  <mat-form-field appearance="fill" class="w-full">
+  <mat-form-field *ngIf="horaSeleccionada" appearance="fill" class="w-full">
     <mat-label>Motivo</mat-label>
     <input
       matInput

@@ -40,7 +40,7 @@ export class MascotasComponent implements OnInit {
           .getMascotas()
           .subscribe((m) => (this.mascotas = m));
         this.userApiAservice
-          .getUsuariosTutores()
+          .getUsuarios()
           .subscribe((u) => (this.usuarios = u));
       } else {
         this.mascotasService
@@ -58,27 +58,46 @@ export class MascotasComponent implements OnInit {
     if (!this.searchTerm) {
       return this.mascotas;
     }
+
     const term = this.searchTerm.toLowerCase();
-    return this.mascotas.filter(
-      (m) =>
+
+    return this.mascotas.filter((m) => {
+      const usuario = this.usuarios.find((u) => u.id === m.idUsuario);
+
+      const nombreDueno = usuario
+        ? `${usuario.nombre} ${usuario.apellido}`.toLowerCase()
+        : '';
+      const rutDueno = usuario ? usuario.rut.toLowerCase() : '';
+
+      return (
         m.nombre.toLowerCase().includes(term) ||
         m.especie.toLowerCase().includes(term) ||
         m.raza.toLowerCase().includes(term) ||
-        m.sexo.toLowerCase().includes(term)
-    );
+        m.sexo.toLowerCase().includes(term) ||
+        nombreDueno.includes(term) ||
+        rutDueno.includes(term)
+      );
+    });
   }
 
   toggleFormulario() {
     this.mostrarFormulario = true;
   }
 
+  nombreTutor(id: number): string {
+    const usuario = this.usuarios.find((u) => u.id === id);
+    return usuario
+      ? `${usuario.nombre} ${usuario.apellido} (${usuario.rut})`
+      : 'Desconocido';
+  }
+
   agregarMascota() {
     const mascotaAEnviar = {
       ...this.nuevaMascota,
-      idUsuario: parseInt(this.nuevaMascota.idUsuario as unknown as string)
+      idUsuario: parseInt(this.nuevaMascota.idUsuario as unknown as string),
     };
 
-    this.mascotasService.createMascota(mascotaAEnviar).subscribe(m => {
+    this.mascotasService.createMascota(mascotaAEnviar).subscribe((m) => {
       this.mascotas.push(m);
       this.mostrarFormulario = false;
       this.nuevaMascota = {
@@ -87,7 +106,7 @@ export class MascotasComponent implements OnInit {
         raza: '',
         sexo: '',
         fechaNacimiento: '',
-        idUsuario: 0
+        idUsuario: 0,
       };
     });
   }
