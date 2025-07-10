@@ -15,7 +15,7 @@ export type Cita = {
   providedIn: 'root'
 })
 export class CitaService {
-  private apiUrl = '/api/citas/citas';
+  private apiUrl = '/api/citas';
 
   constructor(private http: HttpClient) {}
 
