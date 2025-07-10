@@ -41,7 +41,7 @@ export class NavbarComponent {
   ngOnInit(): void {
     this.citaService
       .getCitasPorVeterinario(this.userService.getUsuario()?.id as number)
-      .subscribe((c) => (this.citas = c.length));
+      .subscribe((c) => (this.citas = c.filter(c => c.estado === 'Pendiente').length));
   }
 
   nombreUsuario(): string {

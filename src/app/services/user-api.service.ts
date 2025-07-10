@@ -15,6 +15,10 @@ export class UsuarioApiService {
     return this.http.post<Usuario>(this.apiUrl, usuario);
   }
 
+  getUsuarios() {
+    return this.http.get<Usuario[]>(this.apiUrl);
+  }
+
   getUsuarioPorId(id: number) {
     return this.http.get<Usuario>(`${this.apiUrl}/${id}`);
   }
@@ -25,5 +29,9 @@ export class UsuarioApiService {
 
   getUsuariosTutores(): Observable<Usuario[]> {
     return this.http.get<Usuario[]>(`${this.apiUrl}/tutores`);
+  }
+
+  getUsuariosVeterinarios(): Observable<Usuario[]> {
+    return this.http.get<Usuario[]>(`${this.apiUrl}/veterinarios`);
   }
 }

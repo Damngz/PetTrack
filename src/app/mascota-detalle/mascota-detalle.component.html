@@ -9,7 +9,7 @@
     }})
   </h2>
   <div
-    class="flex relative gap-4 bg-white rounded-2xl shadow p-4 dark:bg-neutral-700 max-w-[430px]"
+    class="flex relative gap-4 bg-white rounded-2xl shadow p-4 dark:bg-neutral-700 max-w-[500px]"
   >
     <div class="bg-neutral-50 max-w-1/3 h-full rounded-2xl">
       <img
@@ -31,7 +31,7 @@
         Fecha nacimiento: {{ mascota.fechaNacimiento | date : "dd/MM/yyyy" }}
       </p>
       <p class="text-gray-700 dark:text-gray-300">
-        Dueño: {{ mascota.idUsuario }}
+        Dueño: {{ nombreTutor() }}
       </p>
     </div>
     <div *ngIf="isVeterinario()" class="absolute top-2 right-2">
@@ -264,7 +264,7 @@
         </p>
         <p class="text-white">
           <strong class="text-emerald-500">Veterinario:</strong>
-          {{ registro.idUsuario }}
+          {{ nombreVeterinario(registro.idUsuario) }}
         </p>
       </div>
     </div>
@@ -365,13 +365,74 @@
         </p>
         <p class="text-white">
           <strong class="text-emerald-500">Veterinario:</strong>
-          {{ vacuna.idUsuario }}
+          {{ nombreVeterinario(vacuna.idUsuario) }}
         </p>
       </div>
     </div>
   </div>
 
   <div *ngIf="tab === 'citas'" class="mt-6">
-    <app-crear-cita [idUsuario]="1" [idMascota]="1"></app-crear-cita>
+    <button
+      class="bg-emerald-500 text-white px-4 py-2 rounded mb-4 cursor-pointer hover:bg-emerald-600"
+      (click)="mostrarFormularioCita = !mostrarFormularioCita"
+    >
+      {{ mostrarFormularioCita ? "Cancelar" : "Agregar nueva cita" }}
+    </button>
+    <div *ngIf="mostrarFormularioCita">
+      <app-crear-cita [idMascota]="idMascota"></app-crear-cita>
+    </div>
+    <div *ngIf="citas.length === 0" class="text-gray-500 dark:text-gray-300">
+      No hay registros de citas.
+    </div>
+
+    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div
+        *ngFor="let cita of citas"
+        class="{{ cita.estado === 'Pendiente' ? 'bg-neutral-800' : cita.estado === 'Completada' ? 'bg-emerald-500' : 'bg-neutral-500' }} flex flex-col rounded-2xl shadow p-6 gap-2"
+      >
+        <div class="flex flex-col gap-2">
+          <div class="flex w-full justify-between">
+            <div
+              class="flex justify-center items-center bg-neutral-50 w-fit p-2 mb-2 rounded-full text-emerald-500"
+            >
+              <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 512 512"
+              width="15"
+              height="15"
+            >
+              <path
+                fill="#262626"
+                d="M96 352L96 96c0-35.3 28.7-64 64-64l256 0c35.3 0 64 28.7 64 64l0 197.5c0 17-6.7 33.3-18.7 45.3l-58.5 58.5c-12 12-28.3 18.7-45.3 18.7L160 416c-35.3 0-64-28.7-64-64zM272 128c-8.8 0-16 7.2-16 16l0 48-48 0c-8.8 0-16 7.2-16 16l0 32c0 8.8 7.2 16 16 16l48 0 0 48c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-48 48 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-48 0 0-48c0-8.8-7.2-16-16-16l-32 0zm24 336c13.3 0 24 10.7 24 24s-10.7 24-24 24l-160 0C60.9 512 0 451.1 0 376L0 152c0-13.3 10.7-24 24-24s24 10.7 24 24l0 224c0 48.6 39.4 88 88 88l160 0z"
+              />
+            </svg>
+            </div>
+            <div class="bg-neutral-50 w-fit px-4 py-0.5 mb-2 rounded-full">
+              <p class="text-md font-medium text-neutral-800">
+                {{ cita.fecha| date : "dd / MM / yyyy" }}
+              </p>
+            </div>
+          </div>
+          <p class="text-white">
+            <strong class="{{ cita.estado === 'Pendiente' ? 'text-emerald-500' : 'text-neutral-800' }} ">Veterinario:</strong> {{ nombreVeterinario(cita.idUsuario) }}
+          </p>
+          <p class="text-white">
+            <strong class="{{ cita.estado === 'Pendiente' ? 'text-emerald-500' : 'text-neutral-800' }} ">Motivo:</strong> {{ cita.motivo }}
+          </p>
+          <p class="text-white">
+            <strong class="{{ cita.estado === 'Pendiente' ? 'text-emerald-500' : 'text-neutral-800' }} ">Estado:</strong>
+            {{ cita.estado }}
+          </p>
+        </div>
+        <div *ngIf="cita.estado === 'Pendiente' && isVeterinario()" class="flex gap-2 pt-4">
+          <button (click)="modificarCita(cita, 'Completada')" class="rounded-lg flex-1 px-3 py-1.5 bg-emerald-500 cursor-pointer hover:bg-emerald-600 text-white font-medium">Completar</button>
+          <button (click)="modificarCita(cita, 'Cancelada')" class="rounded-lg flex-1 px-3 py-1.5 bg-neutral-500 cursor-pointer hover:bg-neutral-600 text-white font-medium">Cancelar</button>
+          <button (click)="modificarCita(cita, 'No asiste')" class="rounded-lg flex-1 px-3 py-1.5 border border-white cursor-pointer hover:bg-white text-white hover:text-neutral-800 font-medium">No asiste</button>
+        </div>
+        <div *ngIf="cita.estado === 'Pendiente' && !isVeterinario()" class="flex gap-2 pt-4">
+          <button (click)="eliminarCita(cita)" class="rounded-lg flex-1 px-3 py-1.5 border border-white cursor-pointer hover:bg-white text-white hover:text-neutral-800 font-medium">Eliminar</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
