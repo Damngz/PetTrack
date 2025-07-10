@@ -16,7 +16,7 @@ export interface HistorialMedico {
   providedIn: 'root'
 })
 export class HistorialMedicoService {
-  private baseUrl = '/api/historial/historial_medico';
+  private baseUrl = '/api/historial_medico';
 
   constructor(private http: HttpClient) {}
 
