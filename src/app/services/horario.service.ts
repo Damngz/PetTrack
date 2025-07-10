@@ -12,7 +12,7 @@ export type HorarioAtencion = {
 
 @Injectable({ providedIn: 'root' })
 export class HorarioAtencionService {
-  private apiUrl = 'http://localhost:8085/horarios';
+  private apiUrl = '/api/horarios/horarios';
 
   constructor(private http: HttpClient) {}
 
