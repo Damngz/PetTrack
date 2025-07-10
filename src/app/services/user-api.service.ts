@@ -13,7 +13,11 @@ export class UsuarioApiService {
 
   createTutor(usuario: Partial<Usuario>) {
     return this.http.post<Usuario>(this.apiUrl, usuario);
-  } 
+  }
+
+  getUsuarioPorId(id: number) {
+    return this.http.get<Usuario>(`${this.apiUrl}/${id}`);
+  }
 
   getUsuarioPorCorreo(correo: string): Observable<Usuario> {
     return this.http.get<Usuario>(`${this.apiUrl}/correo/${correo}`);

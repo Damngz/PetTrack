@@ -30,5 +30,10 @@ export const routes: Routes = [
     path: 'tutores',
     loadComponent: () => import('./tutores/tutores.component').then(load => load.TutoresComponent),
     canActivate: [AuthGuard]
+  },
+  {
+    path: 'citas',
+    loadComponent: () => import('./citas/citas.component').then(load => load.CitasComponent),
+    canActivate: [AuthGuard]
   }
 ]
