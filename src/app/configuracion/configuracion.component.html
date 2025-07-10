@@ -1,0 +1,33 @@
+<div
+  class="p-4 pt-6 sm:pl-68 sm:mt-16 w-full overflow-x-hidden flex flex-col gap-4"
+>
+  <div class="flex">
+    <div class="p-6 bg-neutral-700 rounded-xl space-y-4">
+      <h2 class="text-2xl font-semibold text-emerald-500">Configuración de Atención</h2>
+      <div *ngFor="let dia of dias" class="flex items-center gap-4">
+        <label class="w-24 capitalize font-medium text-white">{{ dia.toLowerCase() }}</label>
+        <input type="checkbox" [(ngModel)]="horarios[dia].habilitado" />
+        <input
+          type="time"
+          [(ngModel)]="horarios[dia].horaInicio"
+          [disabled]="!horarios[dia].habilitado"
+          class="rounded border p-1 bg-white"
+        />
+        <span class="text-white">a</span>
+        <input
+          type="time"
+          [(ngModel)]="horarios[dia].horaFin"
+          [disabled]="!horarios[dia].habilitado"
+          class="rounded border p-1 bg-white"
+        />
+      </div>
+    
+      <button
+        (click)="guardar()"
+        class="mt-4 px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700"
+      >
+        Guardar cambios
+      </button>
+    </div>
+  </div>
+</div>
