@@ -66,8 +66,8 @@
           {{ cita.motivo }}
         </p>
         <p class="text-white">
-          <strong class="{{ cita.estado === 'Pendiente' ? 'text-emerald-500' : 'text-neutral-800' }} ">Mascota:</strong>
-          {{ nombreMascota(cita.idMascota) }}
+          <strong class="{{ cita.estado === 'Pendiente' ? 'text-emerald-500' : 'text-neutral-800' }} ">Mascota: </strong>
+          <a class="underline cursor-pointer" href="/mascotas/{{ cita.idMascota }}">{{ nombreMascota(cita.idMascota) }}</a>
         </p>
         <p class="text-white">
           <strong class="{{ cita.estado === 'Pendiente' ? 'text-emerald-500' : 'text-neutral-800' }} ">Estado:</strong>
@@ -88,7 +88,7 @@
           </button>
           <button
             (click)="modificarCita(cita, 'No asiste')"
-            class="rounded-lg flex-1 px-3 py-1.5 border border-white cursor-pointer hover:bg-white text-white hover:text-bg-neutral-800 font-medium"
+            class="rounded-lg flex-1 px-3 py-1.5 border border-white cursor-pointer hover:bg-white text-white hover:text-neutral-800 font-medium"
           >
             No asiste
           </button>

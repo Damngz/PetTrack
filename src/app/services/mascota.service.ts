@@ -16,7 +16,7 @@ export interface Mascota {
   providedIn: 'root'
 })
 export class MascotaService {
-  private apiUrl = 'http://localhost:8081/mascotas';
+  private apiUrl = '/api/mascotas/mascotas';
 
   constructor(private http: HttpClient) {}
 

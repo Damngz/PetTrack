@@ -38,12 +38,6 @@ export class NavbarComponent {
     return this.userService.isVeterinario();
   }
 
-  ngOnInit(): void {
-    this.citaService
-      .getCitasPorVeterinario(this.userService.getUsuario()?.id as number)
-      .subscribe((c) => (this.citas = c.filter(c => c.estado === 'Pendiente').length));
-  }
-
   nombreUsuario(): string {
     const user = this.userService.getUsuario();
     const userName = user?.nombre ? `${user.nombre} ${user.apellido}` : '';

@@ -176,10 +176,6 @@
             />
           </svg>
           <span class="flex-1 ms-3 whitespace-nowrap">Citas médicas</span>
-          <span
-            class="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-emerald-100 bg-blue-100 rounded-full dark:bg-neutral-800 dark:text-emerald-300 border-emerald-500 border-2"
-            >{{ citas }}</span
-          >
         </a>
       </li>
       <li *ngIf="esVeterinario()">
@@ -202,7 +198,7 @@
           <span class="flex-1 ms-3 whitespace-nowrap">Tutores</span>
         </a>
       </li>
-      <li *ngIf="esVeterinario()">
+      <!-- <li *ngIf="esVeterinario()">
         <a
           routerLink="/emergencias"
           routerLinkActive="bg-emerald-500 text-white"
@@ -222,7 +218,7 @@
           </svg>
           <span class="flex-1 ms-3 whitespace-nowrap">Emergencia</span>
         </a>
-      </li>
+      </li> -->
       <li *ngIf="esVeterinario()">
         <a
           routerLink="/configuracion"
