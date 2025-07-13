@@ -13,6 +13,7 @@ import { PublicClientApplication, InteractionType } from '@azure/msal-browser';
       clientId: 'ac0ca62a-d8d0-46a3-a8f0-67b5b8d9ceac',
       authority: 'https://login.microsoftonline.com/8fa34533-db7c-401c-a96e-22f7ea044ade',
       redirectUri: 'https://34.192.55.32',
+      // redirectUri: 'http://localhost:4200'
     },
   });
 
