@@ -45,6 +45,7 @@ export class MascotaDetalleComponent implements OnInit {
   veterinarios: Usuario[] = [];
   carnetGenerado = false;
   qrText = '';
+  vencimiento: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -61,6 +62,9 @@ export class MascotaDetalleComponent implements OnInit {
     const mascotaId = +this.route.snapshot.paramMap.get('id')!;
     this.idMascota = mascotaId;
     this.user = this.userService.getUsuario() as Usuario;
+    const hoy = new Date();
+    const vencimiento = new Date(hoy.setMonth(hoy.getMonth() + 6));
+    this.vencimiento = vencimiento.toLocaleDateString('es-ES');
     this.mascotaService.getMascotaById(mascotaId).subscribe((m) => {
       this.mascota = m;
       this.userAPIService
