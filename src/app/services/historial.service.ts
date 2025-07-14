@@ -16,15 +16,16 @@ export interface HistorialMedico {
   providedIn: 'root'
 })
 export class HistorialMedicoService {
-  private baseUrl = '/api/historial_medico';
+  // private apiUrl = 'http://localhost:8082/historial_medico';
+  private apiUrl = '/api/historial_medico';
 
   constructor(private http: HttpClient) {}
 
   createAtencion(atencion: HistorialMedico) {
-    return this.http.post<HistorialMedico>(this.baseUrl, atencion);
+    return this.http.post<HistorialMedico>(this.apiUrl, atencion);
   }
 
   getByMascotaId(id: number): Observable<HistorialMedico[]> {
-    return this.http.get<HistorialMedico[]>(`${this.baseUrl}/mascota/${id}`);
+    return this.http.get<HistorialMedico[]>(`${this.apiUrl}/mascota/${id}`);
   }
 }

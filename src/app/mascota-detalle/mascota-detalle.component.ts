@@ -1,6 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { QRCodeComponent } from 'angularx-qrcode'
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 import {
   HistorialMedicoService,
   HistorialMedico,
@@ -15,11 +18,12 @@ import { Cita, CitaService } from '../services/cita.service';
 
 @Component({
   selector: 'app-mascota-detalle',
-  imports: [CommonModule, FormsModule, CrearCitaComponent],
+  imports: [CommonModule, FormsModule, CrearCitaComponent, QRCodeComponent],
   templateUrl: './mascota-detalle.component.html',
   styleUrls: ['./mascota-detalle.component.css'],
 })
 export class MascotaDetalleComponent implements OnInit {
+  @ViewChild('carnetRef', { static: false }) carnetRef!: ElementRef;
   idMascota!: number;
   historial: HistorialMedico[] = [];
   mascota: Partial<Mascota> = {};
@@ -39,6 +43,9 @@ export class MascotaDetalleComponent implements OnInit {
   tutor: Partial<Usuario> = {};
   citas: Cita[] = [];
   veterinarios: Usuario[] = [];
+  carnetGenerado = false;
+  qrText = '';
+  vencimiento: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -55,6 +62,9 @@ export class MascotaDetalleComponent implements OnInit {
     const mascotaId = +this.route.snapshot.paramMap.get('id')!;
     this.idMascota = mascotaId;
     this.user = this.userService.getUsuario() as Usuario;
+    const hoy = new Date();
+    const vencimiento = new Date(hoy.setMonth(hoy.getMonth() + 6));
+    this.vencimiento = vencimiento.toLocaleDateString('es-ES');
     this.mascotaService.getMascotaById(mascotaId).subscribe((m) => {
       this.mascota = m;
       this.userAPIService
@@ -90,6 +100,49 @@ export class MascotaDetalleComponent implements OnInit {
     });
     this.userAPIService.getUsuariosVeterinarios().subscribe((v) => {
       this.veterinarios = v;
+    });
+  }
+
+  async generarCarnet() {
+    const objectToQR = {
+      nombre: this.mascota.nombre,
+      fechaNacimiento: this.mascota.fechaNacimiento,
+      especie: this.mascota.especie,
+      raza: this.mascota.raza,
+      sexo: this.mascota.sexo,
+      tutor: this.tutor.rut,
+      vacunas: this.vacunas.length > 0 ? this.vacunas.map((vacuna) => { return { nombre: vacuna.nombre, fecha: vacuna.fechaAplicacion }}) : 'No tiene vacunas registradas.',
+    };
+    const request = await fetch('https://zd4wd5lwmca2tm3fkr47e2kkuy0dpvld.lambda-url.us-east-1.on.aws/', {
+      method: 'POST',
+      body: JSON.stringify(objectToQR)
+    });
+    const response = await request.json();
+
+    this.qrText = response.qrUrl;
+    this.carnetGenerado = true;
+  }
+
+  generarPDF() {
+    const carnetElement = this.carnetRef.nativeElement;
+
+    html2canvas(carnetElement, {
+      scale: 4,
+      useCORS: true,
+    }).then((canvas) => {
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+      });
+
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(this.mascota.nombre?.toLowerCase()+'-carnet.pdf');
     });
   }
 
